@@ -17,7 +17,11 @@ export async function registerUser({ name, email, password }: RegisterPayload) {
   const { data, error } = await supabase.auth.signUp({
     email: email.trim().toLowerCase(),
     password,
-    options: { data: { name: name.trim() } },
+    options: {
+      data: { name: name.trim() },
+      // Back to the site the user signed up on (must be listed in Supabase's Redirect URLs)
+      emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}language`,
+    },
   });
   if (error) throw error;
   return data;
@@ -30,6 +34,15 @@ export async function loginUser({ email, password }: LoginPayload) {
   });
   if (error) throw error;
   return data;
+}
+
+export async function resendConfirmation(email: string) {
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email: email.trim().toLowerCase(),
+    options: { emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}language` },
+  });
+  if (error) throw error;
 }
 
 export async function logoutUser() {

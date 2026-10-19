@@ -10,7 +10,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink } from 'lucide-react';
+import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 import memorizLogo from '../assets/memoriz-logo.svg';
 import { CanvasItem } from '../types/builder';
@@ -22,6 +22,7 @@ import ElementEditor from '../components/builder/ElementEditor';
 import TemplatePreview from '../components/builder/TemplatePreview';
 import PreviewModal from '../components/builder/PreviewModal';
 import PublishDialog from '../components/builder/PublishDialog';
+import ShareDialog from '../components/builder/ShareDialog';
 import { getMySite, saveDraft, publicSiteUrl, MySite } from '../lib/sites';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Lang } from '../i18n/translations';
@@ -47,6 +48,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -224,6 +226,16 @@ export default function Dashboard() {
         </a>
       )}
 
+      {!isMobile && liveUrl && (
+        <button
+          onClick={() => setShowShare(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-green-200 text-green-700 hover:bg-green-50 transition"
+        >
+          <QrCode className="w-3.5 h-3.5" />
+          {t.share.button}
+        </button>
+      )}
+
       <button
         onClick={handleSave}
         disabled={saving}
@@ -267,6 +279,10 @@ export default function Dashboard() {
         site={site}
         onPublished={setSite}
       />
+
+      {liveUrl && site?.slug && (
+        <ShareDialog open={showShare} onOpenChange={setShowShare} url={liveUrl} slug={site.slug} />
+      )}
     </header>
   );
 
@@ -287,17 +303,21 @@ export default function Dashboard() {
 
         {/* No room in the phone header, so the live link gets its own bar */}
         {liveUrl && (
-          <a
-            href={liveUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="shrink-0 flex items-center gap-2 px-4 py-2 bg-green-50 border-b border-green-100 text-xs text-green-800"
-          >
-            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
-            <span className="font-semibold shrink-0">{t.dashboard.live}</span>
-            <span className="truncate text-green-700">{liveUrl.replace(/^https?:\/\//, '')}</span>
-            <ExternalLink className="w-3.5 h-3.5 shrink-0 ml-auto text-green-600" />
-          </a>
+          <div className="shrink-0 flex items-center gap-2 pl-4 pr-2 py-1.5 bg-green-50 border-b border-green-100 text-xs text-green-800">
+            <a href={liveUrl} target="_blank" rel="noreferrer" className="flex min-w-0 flex-1 items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
+              <span className="font-semibold shrink-0">{t.dashboard.live}</span>
+              <span className="truncate text-green-700">{liveUrl.replace(/^https?:\/\//, '')}</span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0 text-green-600" />
+            </a>
+            <button
+              onClick={() => setShowShare(true)}
+              className="flex shrink-0 items-center gap-1 rounded-md bg-white px-2.5 py-1 font-medium text-green-700 shadow-sm ring-1 ring-green-200"
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              {t.share.button}
+            </button>
+          </div>
         )}
 
         {/* Tab content */}

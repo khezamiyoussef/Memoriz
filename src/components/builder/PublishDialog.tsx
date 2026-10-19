@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Copy, ExternalLink, Loader2, X } from 'lucide-react';
+import { Check, ExternalLink, Loader2, X } from 'lucide-react';
+import SharePanel from './SharePanel';
 import {
   Dialog,
   DialogContent,
@@ -39,7 +40,6 @@ export default function PublishDialog({ open, onOpenChange, items, site, onPubli
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const checkId = useRef(0);
 
   // Reset each time the dialog opens
@@ -50,7 +50,6 @@ export default function PublishDialog({ open, onOpenChange, items, site, onPubli
     setPublishing(false);
     setPublishError(false);
     setPublishedUrl(null);
-    setCopied(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -95,17 +94,6 @@ export default function PublishDialog({ open, onOpenChange, items, site, onPubli
     }
   };
 
-  const handleCopy = async () => {
-    if (!publishedUrl) return;
-    try {
-      await navigator.clipboard.writeText(publishedUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard blocked; the URL is still visible to copy by hand
-    }
-  };
-
   const host = publicSiteBase().replace(/^https?:\/\//, '');
 
   const statusMessage: Partial<Record<Status, { text: string; tone: 'muted' | 'ok' | 'bad' }>> = {
@@ -122,7 +110,7 @@ export default function PublishDialog({ open, onOpenChange, items, site, onPubli
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         {publishedUrl ? (
           <>
             <DialogHeader>
@@ -130,16 +118,7 @@ export default function PublishDialog({ open, onOpenChange, items, site, onPubli
               <DialogDescription>{t.publish.successDesc}</DialogDescription>
             </DialogHeader>
 
-            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-              <span className="flex-1 truncate text-sm font-medium text-gray-800">{publishedUrl}</span>
-              <button
-                onClick={handleCopy}
-                className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs text-gray-600 hover:bg-gray-200 transition"
-              >
-                {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? t.publish.copied : t.publish.copy}
-              </button>
-            </div>
+            <SharePanel url={publishedUrl} slug={slug} />
             <p className="text-xs text-gray-400">{t.publish.republishNote}</p>
 
             <DialogFooter className="gap-2 sm:gap-0">
