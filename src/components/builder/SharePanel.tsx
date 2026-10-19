@@ -58,7 +58,7 @@ export default function SharePanel({ url, slug }: Props) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       {/* QR code (rendered at 512px for a sharp download, shown smaller) */}
       <div className="flex flex-col items-center gap-2">
         <div className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
@@ -70,7 +70,10 @@ export default function SharePanel({ url, slug }: Props) {
             marginSize={2}
             fgColor="#1f2937"
             imageSettings={{ src: memorizLogo, width: 104, height: 104, excavate: true }}
-            className="h-44 w-44"
+            // The library sets an inline 512px size; `style` overrides it (the canvas
+            // itself stays 512px, so the downloaded PNG is still sharp)
+            style={{ width: 176, height: 176 }}
+            className="block"
             aria-label={s.qrAlt}
           />
         </div>
