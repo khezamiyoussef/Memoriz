@@ -1,10 +1,15 @@
 // One-off: copy users from MongoDB into Supabase Auth, keeping their bcrypt
 // password hashes so existing passwords keep working.
 //
-// Usage (from backend-youssef/backend-youssef):
-//   MONGODB_URI=... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/migrate-users-to-supabase.js
-// Run the SQL migration in /supabase/migrations first so profiles get created.
-import "dotenv/config";
+// Usage (from the repo root), with MONGODB_URI, SUPABASE_URL and
+// SUPABASE_SERVICE_ROLE_KEY in server/.env:
+//   npm run migrate:users
+// Run the SQL migrations in /supabase/migrations first so profiles get created.
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+
+// server/.env, regardless of the folder the command is run from
+dotenv.config({ path: fileURLToPath(new URL("../.env", import.meta.url)) });
 import mongoose from "mongoose";
 import { createClient } from "@supabase/supabase-js";
 
