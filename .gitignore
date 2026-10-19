@@ -1,0 +1,8 @@
+node_modules/
+dist/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+emailtest

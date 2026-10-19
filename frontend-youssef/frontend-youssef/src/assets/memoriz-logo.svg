@@ -1,0 +1,36 @@
+<svg width="100%" viewBox="0 0 680 480" role="img" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="burg" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#6B0F1A"/>
+    <stop offset="35%" stop-color="#9B2335"/>
+    <stop offset="65%" stop-color="#C97D6E"/>
+    <stop offset="100%" stop-color="#F2E8DC"/>
+  </linearGradient>
+  <linearGradient id="burg2" x1="100%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#F2E8DC"/>
+    <stop offset="40%" stop-color="#C97D6E"/>
+    <stop offset="75%" stop-color="#9B2335"/>
+    <stop offset="100%" stop-color="#6B0F1A"/>
+  </linearGradient>
+  <linearGradient id="plane" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#F2E8DC" stop-opacity="0.95"/>
+    <stop offset="100%" stop-color="#E8C4B0" stop-opacity="0.85"/>
+  </linearGradient>
+  <clipPath id="heartclip">
+    <path d="M340 440 C340 440 100 300 100 150 C100 60 160 10 220 10 C270 10 310 38 340 70 C370 38 410 10 460 10 C520 10 580 60 580 150 C580 300 340 440 340 440Z"/>
+  </clipPath>
+</defs>
+
+<path d="M340 440 C340 440 100 300 100 150 C100 60 160 10 220 10 C270 10 310 38 340 70 C370 38 410 10 460 10 C520 10 580 60 580 150 C580 300 340 440 340 440Z" fill="url(#burg)"/>
+<path d="M340 400 C340 400 140 280 140 158 C140 88 188 48 232 48 C275 48 308 70 340 100 C372 70 405 48 448 48 C492 48 540 88 540 158 C540 280 340 400 340 400Z" fill="url(#burg2)" opacity="0.3"/>
+<path d="M175 280 L490 60 L390 350 Z" fill="url(#plane)" clip-path="url(#heartclip)"/>
+<path d="M390 350 L340 230 L490 60 Z" fill="#6B0F1A" opacity="0.25" clip-path="url(#heartclip)"/>
+<path d="M175 280 L340 230 L390 350 Z" fill="#F2E8DC" opacity="0.15" clip-path="url(#heartclip)"/>
+<line x1="490" y1="60" x2="340" y2="230" stroke="#F2E8DC" stroke-width="1.2" opacity="0.5" clip-path="url(#heartclip)"/>
+<circle cx="210" cy="90" r="3" fill="#F2E8DC" opacity="0.4"/>
+<circle cx="470" cy="60" r="2" fill="#F2E8DC" opacity="0.3"/>
+<circle cx="480" cy="280" r="2.5" fill="#F2E8DC" opacity="0.35"/>
+<circle cx="220" cy="310" r="2" fill="#F2E8DC" opacity="0.25"/>
+<circle cx="340" cy="420" r="3" fill="#F2E8DC" opacity="0.3"/>
+<path d="M340 440 C340 440 100 300 100 150 C100 60 160 10 220 10 C270 10 310 38 340 70 C370 38 410 10 460 10 C520 10 580 60 580 150 C580 300 340 440 340 440Z" fill="none" stroke="#F2E8DC" stroke-width="1" opacity="0.4"/>
+</svg>

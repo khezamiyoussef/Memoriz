@@ -1,0 +1,192 @@
+================================================================================
+  MOMENTCRAFT — PROJECT DESCRIPTION
+================================================================================
+
+PROJECT OVERVIEW
+----------------
+MomentCraft is a no-code web application for building beautiful, personalized
+celebration pages — birthdays, anniversaries, Valentine's Day, and more. Users
+drag and drop pre-designed templates onto a canvas, customize each section's
+content, and preview the final page instantly. No login or backend required.
+
+The project also ships with a fully pre-built hardcoded celebration site
+("Maryem's Birthday 2025") that showcases the kind of page the builder can
+produce, and is deployed to GitHub Pages.
+
+--------------------------------------------------------------------------------
+TECH STACK
+--------------------------------------------------------------------------------
+
+Framework & Build
+  - React 18.3.1
+  - Vite 8.0.1 (SWC-based, fast HMR)
+  - TypeScript 5.8.3
+
+Styling & UI
+  - Tailwind CSS 3.4.17
+  - Shadcn/ui (Radix UI-based components)
+  - Framer Motion 12.23.24 (animations & transitions)
+  - Lucide React 0.462.0 (icon set)
+
+Routing & State
+  - React Router DOM 6.30.1
+  - React useState / localStorage (canvas persistence)
+
+Drag & Drop
+  - @dnd-kit/core 6.3.1
+  - @dnd-kit/sortable 10.0.0
+  - @dnd-kit/utilities 3.2.2
+
+Other Notable Packages
+  - canvas-confetti 1.9.4 (confetti effects on surprise boxes)
+  - Embla Carousel 8.6.0
+  - Sonner 1.7.4 (toast notifications)
+
+Deployment
+  - GitHub Pages via gh-pages 6.3.0
+  - Base path: /maryem-birthday-site/
+
+--------------------------------------------------------------------------------
+ROUTING
+--------------------------------------------------------------------------------
+
+  /            →  Redirects to /dashboard
+  /dashboard   →  Main builder interface (no auth required)
+  *            →  404 Not Found page
+
+--------------------------------------------------------------------------------
+FILE STRUCTURE
+--------------------------------------------------------------------------------
+
+src/
+├── components/
+│   ├── builder/            Builder UI components
+│   │   ├── Canvas.tsx          Editing canvas (drop zone, 10-element cap)
+│   │   ├── CanvasItem.tsx      Individual draggable element card
+│   │   ├── ElementEditor.tsx   Right-panel property editor
+│   │   ├── LeftPanel.tsx       Template library sidebar
+│   │   ├── PreviewModal.tsx    Full-screen live preview modal
+│   │   └── TemplatePreview.tsx Small inline thumbnail previews
+│   │
+│   ├── preview/            Preview-only render components (for PreviewModal)
+│   │   ├── PreviewCarousel.tsx
+│   │   ├── PreviewFinalMessage.tsx
+│   │   ├── PreviewFlipCards.tsx
+│   │   ├── PreviewFloatingDecoration.tsx
+│   │   ├── PreviewHero.tsx
+│   │   ├── PreviewLoveLetter.tsx
+│   │   ├── PreviewMakeAWish.tsx
+│   │   ├── PreviewNameDisplay.tsx
+│   │   ├── PreviewPhotoGallery.tsx
+│   │   ├── PreviewSurprises.tsx
+│   │   └── PreviewTimeline.tsx
+│   │
+│   ├── birthday/           Pre-built hardcoded demo celebration page
+│   │   ├── FinalMessage.tsx
+│   │   ├── FlipCards.tsx
+│   │   ├── FloatingHearts.tsx
+│   │   ├── HeartCounter.tsx
+│   │   ├── HeroSection.tsx
+│   │   ├── LoveLetter.tsx
+│   │   ├── MakeAWish.tsx
+│   │   ├── MaryemNameSection.tsx
+│   │   ├── MemoriesCarousel.tsx
+│   │   ├── OurFuture.tsx
+│   │   ├── PhotoGallery.tsx
+│   │   ├── Preloader.tsx
+│   │   ├── Surprises.tsx
+│   │   └── TimelineSection.tsx
+│   │
+│   └── ui/                 Shadcn/ui component library
+│
+├── data/
+│   └── templates.ts        All 11 template definitions with fields
+│
+├── hooks/
+│   ├── use-mobile.tsx
+│   └── use-toast.ts
+│
+├── lib/
+│   └── utils.ts            cn() utility (clsx + tailwind-merge)
+│
+├── pages/
+│   ├── Dashboard.tsx       Main builder page
+│   ├── Index.tsx           Pre-built demo celebration page
+│   └── NotFound.tsx        404 page
+│
+└── types/
+    └── builder.ts          CanvasItem, TemplateDef, FieldDef TypeScript types
+
+--------------------------------------------------------------------------------
+TEMPLATES (11 total)
+--------------------------------------------------------------------------------
+
+ID                  Name                  Category      Fields
+──────────────────────────────────────────────────────────────────────────────
+hero                Hero Section          Layout        title, subtitle, button text, background image
+photo-gallery       Photo Gallery         Media         3x (photo + caption)
+love-letter         Love Letter           Content       greeting, body, closing, signature
+flip-cards          Flip Cards            Interactive   3x (front text + back text)
+carousel            Memories Carousel     Media         3x (image + caption)
+timeline            Timeline              Content       title + up to 8 events (date, title, description)
+make-a-wish         Make A Wish           Interactive   title, prompt, placeholder, button text
+final-message       Closing Message       Content       line1, line2, headline, closing, signature
+name-display        Name Display          Content       name + 4x (word + description)
+floating-decoration Floating Hearts       Decoration    color, count (5–30)
+surprises           Surprise Boxes        Interactive   3x (gift label + revealed message)
+
+Template field types: text, textarea, image (base64), color
+
+--------------------------------------------------------------------------------
+BUILDER — HOW IT WORKS
+--------------------------------------------------------------------------------
+
+1. User lands on the Dashboard (no login required).
+2. Left panel lists all 11 templates with search and category filters.
+3. User drags a template from the left panel and drops it onto the canvas.
+4. The element appears as a card on the canvas (max 10 elements total).
+5. Clicking an element opens the ElementEditor right panel for that element.
+6. Each field (text, image, color, etc.) can be edited inline.
+7. Canvas items can be reordered via drag-and-drop.
+8. "Save" button persists the canvas to localStorage (key: saas_canvas_items).
+9. "Preview" button opens the full-screen PreviewModal.
+10. The PreviewModal routes each templateId to its matching Preview component.
+
+Canvas constraints:
+  - Maximum 10 elements
+  - When 10 elements are reached, the drop zone is replaced with a styled
+    "Maximum reached" banner (lock icon + message)
+
+--------------------------------------------------------------------------------
+PREVIEW COMPONENTS
+--------------------------------------------------------------------------------
+
+Each Preview component receives `values: Record<string, string>` and renders
+the corresponding section with live data from the editor. They are independent
+of the builder canvas and simply display what the user configured.
+
+Special behavior:
+  - PreviewMakeAWish: Shows a wish input with a sparkle animation on submit.
+  - PreviewFloatingDecoration: Shows only animated hearts, no text.
+  - PreviewTimeline: Renders only events that have a date or title filled in.
+  - PreviewNameDisplay: Renders only meaning entries with a non-empty word.
+
+--------------------------------------------------------------------------------
+localStorage KEYS
+--------------------------------------------------------------------------------
+
+  saas_canvas_items   JSON — array of CanvasItem (saved builder state)
+
+--------------------------------------------------------------------------------
+SCRIPTS
+--------------------------------------------------------------------------------
+
+  npm run dev        Start Vite dev server
+  npm run build      TypeScript compile + Vite build to /dist
+  npm run preview    Preview production build locally
+  npm run lint       ESLint check
+  npm run deploy     Build + push to gh-pages branch
+
+================================================================================
+  END OF DESCRIPTION
+================================================================================
