@@ -45,10 +45,11 @@ export default function PreviewPhotoGallery({ values }: Props) {
               <div className="aspect-square rounded-sm relative overflow-hidden bg-slate-100">
                 {photo.src ? (
                   <>
+                    <img src={photo.src} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60" />
                     <motion.img
                       src={photo.src}
                       alt={photo.caption}
-                      className="w-full h-full object-cover"
+                      className="relative w-full h-full object-contain"
                       whileHover={{ scale: 1.05 }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />

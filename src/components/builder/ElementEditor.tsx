@@ -57,7 +57,7 @@ export default function ElementEditor({ item, onUpdate, onDelete, onClose, image
           <label className="block text-xs font-medium text-gray-600">{field.label}</label>
           {value ? (
             <div className="relative group">
-              <img src={value} alt={field.label} className="w-full h-24 object-cover rounded-lg border border-gray-200" />
+              <img src={value} alt={field.label} className="w-full h-32 object-contain bg-gray-50 rounded-lg border border-gray-200" />
               <button
                 onClick={() => handleFieldChange(field.id, '')}
                 className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-md opacity-0 group-hover:opacity-100 transition"

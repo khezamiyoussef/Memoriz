@@ -48,16 +48,18 @@ export default function PreviewCarousel({ values }: Props) {
           >
             <AnimatePresence mode="wait">
               {current.src ? (
-                <motion.img
+                <motion.div
                   key={current.src}
-                  src={current.src}
-                  alt={current.title}
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.6 }}
-                  className="w-full h-full object-cover"
-                />
+                  className="absolute inset-0"
+                >
+                  {/* Blurred copy fills the frame so the whole photo can be shown uncropped */}
+                  <img src={current.src} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60" />
+                  <img src={current.src} alt={current.title} className="relative w-full h-full object-contain" />
+                </motion.div>
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-blush to-lavender flex items-center justify-center">
                   <span className="text-6xl">🎠</span>

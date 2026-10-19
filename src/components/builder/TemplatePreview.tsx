@@ -37,7 +37,7 @@ export default function TemplatePreview({ templateId, values }: Props) {
             {[1, 2, 3].map((n) => (
               <div key={n} className="aspect-square rounded overflow-hidden bg-gray-100">
                 {values[`photo${n}`] ? (
-                  <img src={values[`photo${n}`]} alt="" className="w-full h-full object-cover" />
+                  <img src={values[`photo${n}`]} alt="" className="w-full h-full object-contain" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">🖼️</div>
                 )}
@@ -81,7 +81,7 @@ export default function TemplatePreview({ templateId, values }: Props) {
       return (
         <div className="relative h-24 rounded-lg overflow-hidden bg-gray-100">
           {values.slide1Image ? (
-            <img src={values.slide1Image} alt="" className="w-full h-full object-cover" />
+            <img src={values.slide1Image} alt="" className="w-full h-full object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300">🎠</div>
           )}
