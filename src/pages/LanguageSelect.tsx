@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import memorizLogo from '../assets/memoriz-logo.svg';
+import memorizLogo from '../assets/logo.png';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Lang } from '../i18n/translations';
 

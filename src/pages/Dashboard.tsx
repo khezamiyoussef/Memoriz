@@ -12,7 +12,7 @@ import {
 import { arrayMove } from '@dnd-kit/sortable';
 import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
-import memorizLogo from '../assets/memoriz-logo.svg';
+import memorizLogo from '../assets/logo.png';
 import { CanvasItem } from '../types/builder';
 import { getTemplate, countImages } from '../data/templates';
 import { useIsMobile } from '../hooks/use-mobile';

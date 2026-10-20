@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Check, Copy, Download, Facebook, Mail, MessageCircle, MessageSquareText, Send, Share2 } from 'lucide-react';
-import memorizLogo from '../../assets/memoriz-logo.svg';
+import memorizLogo from '../../assets/logo.png';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 interface Props {
@@ -69,7 +69,7 @@ export default function SharePanel({ url, slug }: Props) {
             level="H"
             marginSize={2}
             fgColor="#1f2937"
-            imageSettings={{ src: memorizLogo, width: 104, height: 104, excavate: true }}
+            imageSettings={{ src: memorizLogo, width: 76, height: 104, excavate: true }}
             // The library sets an inline 512px size; `style` overrides it (the canvas
             // itself stays 512px, so the downloaded PNG is still sharp)
             style={{ width: 176, height: 176 }}
