@@ -10,7 +10,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode } from 'lucide-react';
+import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import memorizLogo from '../assets/memoriz-logo.svg';
 import { CanvasItem } from '../types/builder';
@@ -24,6 +24,7 @@ import PreviewModal from '../components/builder/PreviewModal';
 import PublishDialog from '../components/builder/PublishDialog';
 import ShareDialog from '../components/builder/ShareDialog';
 import { getMySite, saveDraft, publicSiteUrl, MySite } from '../lib/sites';
+import { logoutUser, authErrorMessage } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Lang } from '../i18n/translations';
 
@@ -183,6 +184,14 @@ export default function Dashboard() {
       ? getTemplate(activeDragId.replace('template-', ''), lang)
       : null;
 
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      toast.error(authErrorMessage(err, t));
+    }
+  };
+
   const liveUrl = site?.slug && site.published_at ? publicSiteUrl(site.slug) : null;
 
   const header = (
@@ -270,6 +279,16 @@ export default function Dashboard() {
       >
         <Globe className="w-3.5 h-3.5" />
         {t.publish.button}
+      </button>
+
+      {/* RequireAuth sees the sign-out and redirects to /login */}
+      <button
+        onClick={handleLogout}
+        title={t.dashboard.logout}
+        aria-label={t.dashboard.logout}
+        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+      >
+        <LogOut className="w-4 h-4" />
       </button>
 
       <PublishDialog
