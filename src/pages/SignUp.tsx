@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { authErrorMessage, registerUser } from "@/lib/api";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Dictionary } from "@/i18n/translations";
+import memorizLogo from "@/assets/logo.png";
 
 const makeSignUpSchema = (t: Dictionary) =>
   z
@@ -58,6 +59,7 @@ export default function SignUp() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
+          <img src={memorizLogo} alt="Memoriz" className="w-12 h-16 mx-auto mb-2 object-contain" />
           <CardTitle className="text-2xl font-bold">{t.auth.signup.title}</CardTitle>
           <CardDescription>{t.auth.signup.description}</CardDescription>
         </CardHeader>

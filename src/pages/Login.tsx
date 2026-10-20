@@ -12,6 +12,7 @@ import { authErrorMessage, loginUser, resendConfirmation } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Dictionary } from "@/i18n/translations";
+import memorizLogo from "@/assets/logo.png";
 
 const makeLoginSchema = (t: Dictionary) =>
   z.object({
@@ -81,6 +82,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
+          <img src={memorizLogo} alt="Memoriz" className="w-12 h-16 mx-auto mb-2 object-contain" />
           <CardTitle className="text-2xl font-bold">{t.auth.login.title}</CardTitle>
           <CardDescription>{t.auth.login.description}</CardDescription>
         </CardHeader>
