@@ -29,7 +29,7 @@ const en = {
     },
     validation: {
       email: 'Invalid email address',
-      passwordMin: 'Password must be at least 6 characters',
+      passwordMin: 'Password must be at least 8 characters',
       nameMin: 'Name must be at least 2 characters',
       passwordMismatch: 'Passwords do not match',
     },
@@ -288,7 +288,7 @@ const fr: Dictionary = {
     },
     validation: {
       email: 'Adresse e-mail invalide',
-      passwordMin: 'Le mot de passe doit contenir au moins 6 caractères',
+      passwordMin: 'Le mot de passe doit contenir au moins 8 caractères',
       nameMin: 'Le nom doit contenir au moins 2 caractères',
       passwordMismatch: 'Les mots de passe ne correspondent pas',
     },

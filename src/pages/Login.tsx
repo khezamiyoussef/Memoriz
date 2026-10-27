@@ -17,7 +17,8 @@ import memorizLogo from "@/assets/logo.png";
 const makeLoginSchema = (t: Dictionary) =>
   z.object({
     email: z.string().email(t.auth.validation.email),
-    password: z.string().min(6, t.auth.validation.passwordMin),
+    // Length rules apply at sign-up; older accounts may have shorter passwords
+    password: z.string().min(1, t.auth.validation.passwordMin),
   });
 
 type LoginFormValues = z.infer<ReturnType<typeof makeLoginSchema>>;
@@ -40,7 +41,8 @@ export default function Login() {
     const errorCode = params.get("error_code");
     if (errorCode) {
       setLinkFailed(true);
-      toast.error(t.auth.errors[errorCode] ?? params.get("error_description") ?? t.auth.genericError);
+      // Never show error_description: anyone can put text in a link to this page
+      toast.error(t.auth.errors[errorCode] ?? t.auth.genericError);
       navigate(location.pathname, { replace: true }); // drop the error from the address bar
       return;
     }
