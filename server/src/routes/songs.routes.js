@@ -1,149 +1,101 @@
 import { Router } from "express";
 import { spawn } from "child_process";
-import fs from "fs";
-import path from "path";
-import os from "os";
-import crypto from "crypto";
+import { rateLimit } from "express-rate-limit";
+import { requireUser } from "../middleware/auth.middleware.js";
+import { logEvent } from "../logger.js";
 
 const router = Router();
 
+const VIDEO_ID = /^[\w-]{11}$/;
+const MAX_QUERY_LENGTH = 100;
+const MAX_RUNNING = 4; // yt-dlp processes at once, across all users
+const TIMEOUT_MS = 15000;
+let running = 0;
+
+const searchLimit = rateLimit({
+  windowMs: 60_000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  keyGenerator: (req) => req.userId, // runs after requireUser
+  handler: (req, res) => {
+    logEvent("rate_limited", { route: req.path, user: req.userId });
+    res.status(429).json({ error: "Too many requests" });
+  },
+});
+
+// Letters (any language), digits, spaces and a little punctuation. Anything
+// else, including ":" and "/", is dropped, so the query can never become a
+// URL or an option.
+function cleanQuery(raw) {
+  return raw
+    .replace(/[^\p{L}\p{N}\s'.,!?&-]/gu, "")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s-]+/, "")
+    .trim()
+    .slice(0, MAX_QUERY_LENGTH);
+}
+
 // GET /api/songs/search?q=Perfect+Ed+Sheeran
 // Uses yt-dlp to search YouTube and returns the first video ID.
-router.get("/search", (req, res) => {
+router.get("/search", requireUser, searchLimit, (req, res) => {
   const raw = req.query.q;
   if (!raw || typeof raw !== "string") {
     return res.status(400).json({ error: "Query required" });
   }
 
-  const query = raw.replace(/[^\w\s\-'.,!?]/g, "").trim().slice(0, 200);
+  const query = cleanQuery(raw);
   if (!query) return res.status(400).json({ error: "Invalid query" });
 
+  if (running >= MAX_RUNNING) {
+    logEvent("rate_limited", { route: req.path, user: req.userId, reason: "busy" });
+    return res.status(503).json({ error: "Busy, try again shortly" });
+  }
+  running++;
+
+  // No shell; "--" ends the options and the ytsearch1: prefix keeps yt-dlp on
+  // YouTube search, never an arbitrary URL. --ignore-config stops config
+  // files from adding options such as --exec.
   const ytdlp = spawn("yt-dlp", [
-    `ytsearch1:${query}`,
+    "--ignore-config",
     "--get-id",
     "--no-playlist",
     "--quiet",
     "--no-warnings",
-  ]);
-
-  let videoId = "";
-  let timedOut = false;
-
-  const timer = setTimeout(() => {
-    timedOut = true;
-    ytdlp.kill();
-    res.status(504).json({ error: "Search timed out" });
-  }, 15000);
-
-  ytdlp.stdout.on("data", (chunk) => { videoId += chunk.toString(); });
-
-  ytdlp.on("close", (code) => {
-    clearTimeout(timer);
-    if (timedOut) return;
-    const id = videoId.trim();
-    if (code !== 0 || !id) return res.status(500).json({ error: "Search failed" });
-    res.json({ videoId: id });
-  });
-});
-
-// GET /api/songs/stream?q=Perfect+Ed+Sheeran
-// Downloads audio to a temp file then serves it with Range support so the
-// browser can report a real duration and seeking works correctly.
-router.get("/stream", (req, res) => {
-  const raw = req.query.q;
-  if (!raw || typeof raw !== "string") {
-    return res.status(400).json({ error: "Query required" });
-  }
-
-  const query = raw.replace(/[^\w\s\-'.,!?]/g, "").trim().slice(0, 200);
-  if (!query) return res.status(400).json({ error: "Invalid query" });
-
-  const hash = crypto.createHash("md5").update(query).digest("hex").slice(0, 16);
-  const tmpDir = os.tmpdir();
-  const tmpBase = `memoriz-${hash}`;
-
-  const getMime = (filePath) => {
-    const ext = path.extname(filePath).toLowerCase();
-    const types = { ".webm": "audio/webm", ".m4a": "audio/mp4", ".mp3": "audio/mpeg", ".opus": "audio/ogg", ".aac": "audio/aac" };
-    return types[ext] || "audio/octet-stream";
-  };
-
-  const findCached = () => {
-    try {
-      const files = fs.readdirSync(tmpDir).filter(f => f.startsWith(tmpBase + "."));
-      return files.length ? path.join(tmpDir, files[0]) : null;
-    } catch { return null; }
-  };
-
-  const serveFile = (filePath) => {
-    try {
-      const stat = fs.statSync(filePath);
-      const fileSize = stat.size;
-      const mime = getMime(filePath);
-      const range = req.headers.range;
-
-      if (range) {
-        const [s, e] = range.replace(/bytes=/, "").split("-");
-        const start = parseInt(s, 10);
-        const end = e ? parseInt(e, 10) : fileSize - 1;
-        res.writeHead(206, {
-          "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-          "Accept-Ranges": "bytes",
-          "Content-Length": end - start + 1,
-          "Content-Type": mime,
-        });
-        fs.createReadStream(filePath, { start, end }).pipe(res);
-      } else {
-        res.writeHead(200, {
-          "Content-Length": fileSize,
-          "Content-Type": mime,
-          "Accept-Ranges": "bytes",
-        });
-        fs.createReadStream(filePath).pipe(res);
-      }
-    } catch {
-      if (!res.headersSent) res.status(500).json({ error: "Failed to serve audio" });
-    }
-  };
-
-  // Serve from cache if already downloaded
-  const cached = findCached();
-  if (cached) {
-    serveFile(cached);
-    return;
-  }
-
-  // Download to temp file — yt-dlp appends the real extension automatically
-  const ytdlp = spawn("yt-dlp", [
+    "--",
     `ytsearch1:${query}`,
-    "--format", "bestaudio",
-    "--no-playlist",
-    "-o", path.join(tmpDir, `${tmpBase}.%(ext)s`),
-    "--quiet",
-    "--no-warnings",
   ]);
 
-  let timedOut = false;
+  let output = "";
+  let done = false;
+  const finish = (status, body) => {
+    if (done) return;
+    done = true;
+    running--;
+    clearTimeout(timer);
+    if (!res.headersSent) res.status(status).json(body);
+  };
 
   const timer = setTimeout(() => {
-    timedOut = true;
     ytdlp.kill();
-    if (!res.headersSent) res.status(504).json({ error: "Download timed out" });
-  }, 90000);
+    finish(504, { error: "Search timed out" });
+  }, TIMEOUT_MS);
 
-  ytdlp.on("close", (code) => {
-    clearTimeout(timer);
-    if (timedOut) return;
-    const downloaded = findCached();
-    if (code !== 0 || !downloaded) {
-      return res.status(500).json({ error: "Download failed" });
-    }
-    serveFile(downloaded);
+  // Client went away: don't keep the process running
+  res.on("close", () => {
+    if (!done) ytdlp.kill();
   });
 
-  ytdlp.on("error", () => {
-    clearTimeout(timer);
-    if (!timedOut && !res.headersSent) res.status(500).json({ error: "yt-dlp error" });
+  ytdlp.stdout.on("data", (chunk) => {
+    if (output.length < 1000) output += chunk.toString();
+  });
+
+  ytdlp.on("error", () => finish(500, { error: "Search failed" }));
+
+  ytdlp.on("close", (code) => {
+    const id = output.trim();
+    if (code !== 0 || !VIDEO_ID.test(id)) return finish(500, { error: "Search failed" });
+    finish(200, { videoId: id });
   });
 });
 
