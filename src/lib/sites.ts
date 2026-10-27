@@ -89,28 +89,16 @@ export async function checkSlug(slug: string): Promise<SlugStatus> {
 export class SlugTakenError extends Error {}
 
 // Saves the current canvas and makes it the public version at /<slug>.
+// Only publish_site() may set the slug and the public snapshot.
 export async function publishSite(slug: string, items: CanvasItem[], lang: Lang): Promise<MySite> {
-  const content = sanitizeContent(items);
-  const { data, error } = await supabase
-    .from("sites")
-    .upsert(
-      {
-        slug,
-        lang,
-        content,
-        published_content: content,
-        published_at: new Date().toISOString(),
-      },
-      { onConflict: "owner_id" }
-    )
-    .select("id, slug, lang, content, published_at")
-    .single();
+  await saveDraft(items, lang);
+  const { data, error } = await supabase.rpc("publish_site", { p_slug: slug }).single();
   if (error) {
     // unique_violation on slug: someone claimed it between the check and the publish
     if (error.code === "23505") throw new SlugTakenError(error.message);
     throw error;
   }
-  return toMySite(data);
+  return toMySite(data as Record<string, unknown>);
 }
 
 export async function getPublishedSite(slug: string): Promise<PublishedSite | null> {
