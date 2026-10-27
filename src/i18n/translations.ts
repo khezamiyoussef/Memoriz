@@ -29,7 +29,7 @@ const en = {
     },
     validation: {
       email: 'Invalid email address',
-      passwordMin: 'Password must be at least 6 characters',
+      passwordMin: 'Password must be at least 8 characters',
       nameMin: 'Name must be at least 2 characters',
       passwordMismatch: 'Passwords do not match',
     },
@@ -93,6 +93,7 @@ const en = {
     youtubeNotFound: 'No match found on YouTube. Paste a link instead.',
     youtubeUnavailable: 'Automatic search is unavailable right now. Paste a link instead.',
     photoLimitReached: (max: number) => `You've reached the ${max}-photo limit. Remove a photo to add another.`,
+    imageInvalid: "That file couldn't be used as a photo. Try a JPEG or PNG under 25 MB.",
   },
   leftPanel: {
     title: 'Templates',
@@ -287,7 +288,7 @@ const fr: Dictionary = {
     },
     validation: {
       email: 'Adresse e-mail invalide',
-      passwordMin: 'Le mot de passe doit contenir au moins 6 caractères',
+      passwordMin: 'Le mot de passe doit contenir au moins 8 caractères',
       nameMin: 'Le nom doit contenir au moins 2 caractères',
       passwordMismatch: 'Les mots de passe ne correspondent pas',
     },
@@ -350,6 +351,7 @@ const fr: Dictionary = {
     youtubeNotFound: 'Aucun résultat sur YouTube. Collez plutôt un lien.',
     youtubeUnavailable: 'La recherche automatique est indisponible. Collez plutôt un lien.',
     photoLimitReached: (max: number) => `Vous avez atteint la limite de ${max} photos. Supprimez-en une pour en ajouter une autre.`,
+    imageInvalid: "Ce fichier ne peut pas être utilisé comme photo. Essayez un JPEG ou PNG de moins de 25 Mo.",
   },
   leftPanel: {
     title: 'Modèles',

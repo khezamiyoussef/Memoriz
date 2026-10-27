@@ -19,7 +19,7 @@ export default function PreviewHero({ values }: Props) {
     <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-cover bg-center" style={{
         backgroundImage: values.backgroundImage
-          ? `url(${values.backgroundImage})`
+          ? `url("${values.backgroundImage}")`
           : "linear-gradient(135deg, #fce7f3, #e9d5ff, #fef3c7)",
       }}>
         <div className="absolute inset-0 bg-gradient-to-b from-blush/40 via-lavender/30 to-cream/50" />

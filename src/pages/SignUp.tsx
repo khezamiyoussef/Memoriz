@@ -17,7 +17,7 @@ const makeSignUpSchema = (t: Dictionary) =>
     .object({
       name: z.string().min(2, t.auth.validation.nameMin),
       email: z.string().email(t.auth.validation.email),
-      password: z.string().min(6, t.auth.validation.passwordMin),
+      password: z.string().min(8, t.auth.validation.passwordMin),
       confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {

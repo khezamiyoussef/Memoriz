@@ -1,9 +1,11 @@
 import { useRef, ChangeEvent } from 'react';
 import { X, Trash2, Upload, Image } from 'lucide-react';
+import { toast } from 'sonner';
 import YouTubeField from './YouTubeField';
 import { CanvasItem, FieldDef } from '../../types/builder';
 import { getTemplate, MAX_IMAGES } from '../../data/templates';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { prepareImage } from '../../lib/images';
 
 interface Props {
   item: CanvasItem;
@@ -40,12 +42,9 @@ export default function ElementEditor({ item, onUpdate, onDelete, onClose, image
     if (!file) return;
     // Replacing an existing picture is fine; adding a new one must stay within the limit
     if (!item.values[fieldId] && imageCount >= MAX_IMAGES) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result as string;
-      handleFieldChange(fieldId, result);
-    };
-    reader.readAsDataURL(file);
+    prepareImage(file)
+      .then((dataUrl) => handleFieldChange(fieldId, dataUrl))
+      .catch(() => toast.error(t.editor.imageInvalid));
   };
 
   const renderField = (field: FieldDef) => {
