@@ -131,9 +131,7 @@ export default function Dashboard() {
         if (cancelled) return;
         setSite(mySite);
         setCanvasItems(mySite ? mySite.content : loadLegacyItems());
-        shouldShowOnboarding(Boolean(mySite)).then((show) => {
-          if (!cancelled && show) setShowTour(true);
-        });
+        if (shouldShowOnboarding()) setShowTour(true);
       })
       .catch(() => {
         if (!cancelled) toast.error(t.dashboard.loadError);
