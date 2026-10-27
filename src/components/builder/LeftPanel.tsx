@@ -99,7 +99,7 @@ export default function LeftPanel({ onAdd, draggable = true }: LeftPanelProps) {
   });
 
   return (
-    <aside className="w-full md:w-72 bg-gray-50 md:border-r border-gray-100 flex flex-col h-full">
+    <aside data-tour="templates" className="w-full md:w-72 bg-gray-50 md:border-r border-gray-100 flex flex-col h-full">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-gray-100 bg-white">
         <h2 className="text-sm font-bold text-gray-800 mb-3">{t.leftPanel.title}</h2>

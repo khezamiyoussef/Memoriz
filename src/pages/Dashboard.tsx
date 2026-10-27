@@ -23,7 +23,7 @@ import TemplatePreview from '../components/builder/TemplatePreview';
 import PreviewModal from '../components/builder/PreviewModal';
 import PublishDialog from '../components/builder/PublishDialog';
 import ShareDialog from '../components/builder/ShareDialog';
-import OnboardingTour from '../components/onboarding/OnboardingTour';
+import OnboardingTour, { type TourStep } from '../components/onboarding/OnboardingTour';
 import { shouldShowOnboarding } from '../lib/onboarding';
 import { getMySite, saveDraft, publicSiteUrl, MySite } from '../lib/sites';
 import { sanitizeContent } from '../lib/content';
@@ -199,6 +199,31 @@ export default function Dashboard() {
 
   const liveUrl = site?.slug && site.published_at ? publicSiteUrl(site.slug) : null;
 
+  // Shows the part of the dashboard each tour step talks about; returns the data-tour key to highlight
+  const prepareTourStep = (step: TourStep): string | null => {
+    switch (step) {
+      case 'choose':
+        if (isMobile) setMobileTab('templates');
+        return isMobile ? 'tab-templates' : 'templates';
+      case 'edit': {
+        const first = canvasItems[0];
+        if (first) {
+          setSelectedId(first.instanceId);
+          if (isMobile) setMobileTab('edit');
+          return isMobile ? 'tab-edit' : 'editor';
+        }
+        if (isMobile) setMobileTab('canvas');
+        return isMobile ? 'tab-canvas' : 'canvas';
+      }
+      case 'preview':
+        return 'preview';
+      case 'publish':
+        return 'publish';
+      default:
+        return null;
+    }
+  };
+
   const header = (
     <header className="h-14 bg-white border-b border-gray-100 flex items-center px-4 gap-4 shrink-0 shadow-sm z-20">
       <div className="flex items-center gap-2">
@@ -271,6 +296,7 @@ export default function Dashboard() {
       </button>
 
       <button
+        data-tour="preview"
         onClick={() => setShowPreview(true)}
         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-rose-500 text-white hover:bg-rose-600 transition"
       >
@@ -279,6 +305,7 @@ export default function Dashboard() {
       </button>
 
       <button
+        data-tour="publish"
         onClick={() => setShowPublish(true)}
         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-900 text-white hover:bg-gray-700 transition"
       >
@@ -305,7 +332,7 @@ export default function Dashboard() {
         <LogOut className="w-4 h-4" />
       </button>
 
-      <OnboardingTour open={showTour} onClose={() => setShowTour(false)} />
+      <OnboardingTour open={showTour} onClose={() => setShowTour(false)} onStep={prepareTourStep} />
 
       <PublishDialog
         open={showPublish}
@@ -399,6 +426,7 @@ export default function Dashboard() {
         {/* Bottom tab bar */}
         <nav className="h-16 border-t border-gray-100 bg-white flex items-center justify-around shrink-0 px-2 safe-area-bottom">
           <button
+            data-tour="tab-templates"
             onClick={() => setMobileTab('templates')}
             className={`flex flex-col items-center gap-1 px-5 py-2 rounded-xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 ${
               mobileTab === 'templates' ? 'text-rose-500' : 'text-gray-400'
@@ -409,6 +437,7 @@ export default function Dashboard() {
           </button>
 
           <button
+            data-tour="tab-canvas"
             onClick={() => setMobileTab('canvas')}
             className={`relative flex flex-col items-center gap-1 px-5 py-2 rounded-xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 ${
               mobileTab === 'canvas' ? 'text-rose-500' : 'text-gray-400'
@@ -424,6 +453,7 @@ export default function Dashboard() {
           </button>
 
           <button
+            data-tour="tab-edit"
             onClick={() => selectedItem && setMobileTab('edit')}
             className={`flex flex-col items-center gap-1 px-5 py-2 rounded-xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 ${
               mobileTab === 'edit' ? 'text-rose-500' : selectedItem ? 'text-gray-400' : 'text-gray-200'

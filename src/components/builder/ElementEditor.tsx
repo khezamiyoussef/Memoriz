@@ -181,7 +181,7 @@ export default function ElementEditor({ item, onUpdate, onDelete, onClose, image
   };
 
   return (
-    <div className="w-full md:w-72 bg-white md:border-l border-gray-100 flex flex-col h-full md:shadow-lg">
+    <div data-tour="editor" className="w-full md:w-72 bg-white md:border-l border-gray-100 flex flex-col h-full md:shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <div>

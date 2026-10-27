@@ -19,7 +19,7 @@ export default function Canvas({ items, selectedId, onSelect, onDelete, selectio
   const { setNodeRef, isOver } = useDroppable({ id: 'canvas' });
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-100 relative">
+    <div data-tour="canvas" className="flex-1 overflow-y-auto bg-gray-100 relative">
       {/* Canvas header */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
