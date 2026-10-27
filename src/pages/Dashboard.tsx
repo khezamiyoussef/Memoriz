@@ -24,6 +24,7 @@ import PreviewModal from '../components/builder/PreviewModal';
 import PublishDialog from '../components/builder/PublishDialog';
 import ShareDialog from '../components/builder/ShareDialog';
 import { getMySite, saveDraft, publicSiteUrl, MySite } from '../lib/sites';
+import { sanitizeContent } from '../lib/content';
 import { logoutUser, authErrorMessage } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Lang } from '../i18n/translations';
@@ -35,7 +36,7 @@ type MobileTab = 'templates' | 'canvas' | 'edit';
 function loadLegacyItems(): CanvasItem[] {
   try {
     const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? sanitizeContent(JSON.parse(raw)) : [];
   } catch {
     return [];
   }

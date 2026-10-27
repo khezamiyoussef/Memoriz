@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { CanvasItem } from "@/types/builder";
 import type { Lang } from "@/i18n/translations";
+import { sanitizeContent } from "@/lib/content";
 
 export type MySite = {
   id: string;
@@ -47,23 +48,36 @@ export function publicSiteUrl(slug: string) {
   return `${publicSiteBase()}/${slug}`;
 }
 
+const toLang = (value: unknown): Lang => (value === "fr" ? "fr" : "en");
+
+// Rows come back as untyped JSON; never trust their shape.
+function toMySite(row: Record<string, unknown>): MySite {
+  return {
+    id: String(row.id),
+    slug: typeof row.slug === "string" ? row.slug : null,
+    lang: toLang(row.lang),
+    content: sanitizeContent(row.content),
+    published_at: typeof row.published_at === "string" ? row.published_at : null,
+  };
+}
+
 export async function getMySite(): Promise<MySite | null> {
   const { data, error } = await supabase
     .from("sites")
     .select("id, slug, lang, content, published_at")
     .maybeSingle();
   if (error) throw error;
-  return data as MySite | null;
+  return data ? toMySite(data) : null;
 }
 
 export async function saveDraft(content: CanvasItem[], lang: Lang): Promise<MySite> {
   const { data, error } = await supabase
     .from("sites")
-    .upsert({ content, lang }, { onConflict: "owner_id" })
+    .upsert({ content: sanitizeContent(content), lang }, { onConflict: "owner_id" })
     .select("id, slug, lang, content, published_at")
     .single();
   if (error) throw error;
-  return data as MySite;
+  return toMySite(data);
 }
 
 export async function checkSlug(slug: string): Promise<SlugStatus> {
@@ -75,7 +89,8 @@ export async function checkSlug(slug: string): Promise<SlugStatus> {
 export class SlugTakenError extends Error {}
 
 // Saves the current canvas and makes it the public version at /<slug>.
-export async function publishSite(slug: string, content: CanvasItem[], lang: Lang): Promise<MySite> {
+export async function publishSite(slug: string, items: CanvasItem[], lang: Lang): Promise<MySite> {
+  const content = sanitizeContent(items);
   const { data, error } = await supabase
     .from("sites")
     .upsert(
@@ -95,11 +110,13 @@ export async function publishSite(slug: string, content: CanvasItem[], lang: Lan
     if (error.code === "23505") throw new SlugTakenError(error.message);
     throw error;
   }
-  return data as MySite;
+  return toMySite(data);
 }
 
 export async function getPublishedSite(slug: string): Promise<PublishedSite | null> {
   const { data, error } = await supabase.rpc("get_published_site", { p_slug: slug }).maybeSingle();
   if (error) throw error;
-  return data as PublishedSite | null;
+  if (!data) return null;
+  const row = data as Record<string, unknown>;
+  return { slug: String(row.slug), lang: toLang(row.lang), content: sanitizeContent(row.content) };
 }
