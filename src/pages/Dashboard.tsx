@@ -199,6 +199,13 @@ export default function Dashboard() {
 
   const liveUrl = site?.slug && site.published_at ? publicSiteUrl(site.slug) : null;
 
+  // The tour opens the editor on its Edit step; start building from the templates instead
+  const closeTour = () => {
+    setShowTour(false);
+    setSelectedId(null);
+    setMobileTab('templates');
+  };
+
   // Shows the part of the dashboard each tour step talks about; returns the data-tour key to highlight
   const prepareTourStep = (step: TourStep): string | null => {
     switch (step) {
@@ -332,7 +339,7 @@ export default function Dashboard() {
         <LogOut className="w-4 h-4" />
       </button>
 
-      <OnboardingTour open={showTour} onClose={() => setShowTour(false)} onStep={prepareTourStep} />
+      <OnboardingTour open={showTour} onClose={closeTour} onStep={prepareTourStep} />
 
       <PublishDialog
         open={showPublish}
