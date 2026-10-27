@@ -10,7 +10,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode, LogOut } from 'lucide-react';
+import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode, LogOut, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import memorizLogo from '../assets/logo.png';
 import { CanvasItem } from '../types/builder';
@@ -23,6 +23,8 @@ import TemplatePreview from '../components/builder/TemplatePreview';
 import PreviewModal from '../components/builder/PreviewModal';
 import PublishDialog from '../components/builder/PublishDialog';
 import ShareDialog from '../components/builder/ShareDialog';
+import OnboardingTour from '../components/onboarding/OnboardingTour';
+import { shouldShowOnboarding } from '../lib/onboarding';
 import { getMySite, saveDraft, publicSiteUrl, MySite } from '../lib/sites';
 import { sanitizeContent } from '../lib/content';
 import { logoutUser, authErrorMessage } from '../lib/api';
@@ -56,6 +58,7 @@ export default function Dashboard() {
   const [saved, setSaved] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('templates');
+  const [showTour, setShowTour] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -128,6 +131,9 @@ export default function Dashboard() {
         if (cancelled) return;
         setSite(mySite);
         setCanvasItems(mySite ? mySite.content : loadLegacyItems());
+        shouldShowOnboarding(Boolean(mySite)).then((show) => {
+          if (!cancelled && show) setShowTour(true);
+        });
       })
       .catch(() => {
         if (!cancelled) toast.error(t.dashboard.loadError);
@@ -282,6 +288,15 @@ export default function Dashboard() {
         {t.publish.button}
       </button>
 
+      <button
+        onClick={() => setShowTour(true)}
+        title={t.onboarding.help}
+        aria-label={t.onboarding.help}
+        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+      >
+        <HelpCircle className="w-4 h-4" />
+      </button>
+
       {/* RequireAuth sees the sign-out and redirects to /login */}
       <button
         onClick={handleLogout}
@@ -291,6 +306,8 @@ export default function Dashboard() {
       >
         <LogOut className="w-4 h-4" />
       </button>
+
+      <OnboardingTour open={showTour} onClose={() => setShowTour(false)} />
 
       <PublishDialog
         open={showPublish}

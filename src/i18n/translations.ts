@@ -136,6 +136,40 @@ const en = {
     done: 'Done',
     republishNote: 'Changes you make later only go live when you publish again.',
   },
+  onboarding: {
+    welcome: {
+      title: 'Welcome',
+      heading: 'Welcome to Memoriz 💝',
+      body: 'In four quick steps you will build a page for someone you love, then share it with a single link.',
+    },
+    choose: {
+      title: 'Choose',
+      heading: 'Choose your sections',
+      body: 'Pick sections from the Templates panel on the left: a hero, a love letter, photos, a playlist… Click one to add it, or drag it onto the canvas. Drag sections on the canvas to reorder them.',
+      bodyMobile: 'Open the Templates tab and tap a section to add it: a hero, a love letter, photos, a playlist… You can add up to 10.',
+    },
+    edit: {
+      title: 'Edit',
+      heading: 'Make it yours',
+      body: 'Click a section on the canvas to edit it in the panel on the right: your words, up to 8 photos, colours and songs. Press Save to keep your draft.',
+      bodyMobile: 'On the Canvas tab, tap a section, then open the Edit tab to change your words, photos, colours and songs. Press Save to keep your draft.',
+    },
+    preview: {
+      title: 'Preview',
+      heading: 'Check the result',
+      body: 'Press Preview to see your page exactly as the person you share it with will see it.',
+    },
+    publish: {
+      title: 'Publish',
+      heading: 'Publish and share',
+      body: 'Press Publish, choose your link (memoriz.club/your-name) and share it as a link or a QR code. You can keep editing and publish again at any time.',
+    },
+    back: 'Back',
+    next: 'Next',
+    start: 'Start building',
+    skip: 'Skip the tour',
+    help: 'How it works',
+  },
   share: {
     button: 'Share',
     title: 'Share your site',
@@ -393,6 +427,40 @@ const fr: Dictionary = {
     open: 'Ouvrir le site',
     done: 'Terminé',
     republishNote: 'Les modifications ultérieures ne seront visibles qu’après une nouvelle publication.',
+  },
+  onboarding: {
+    welcome: {
+      title: 'Bienvenue',
+      heading: 'Bienvenue sur Memoriz 💝',
+      body: "En quatre étapes, vous allez créer une page pour la personne que vous aimez, puis la partager avec un simple lien.",
+    },
+    choose: {
+      title: 'Choisir',
+      heading: 'Choisissez vos sections',
+      body: "Choisissez des sections dans le panneau Modèles à gauche : un en-tête, une lettre d'amour, des photos, une playlist… Cliquez sur une section pour l'ajouter, ou faites-la glisser sur le canevas. Faites glisser les sections du canevas pour les réorganiser.",
+      bodyMobile: "Ouvrez l'onglet Modèles et touchez une section pour l'ajouter : un en-tête, une lettre d'amour, des photos, une playlist… Jusqu'à 10 sections.",
+    },
+    edit: {
+      title: 'Modifier',
+      heading: 'Personnalisez-la',
+      body: "Cliquez sur une section du canevas pour la modifier dans le panneau de droite : vos mots, jusqu'à 8 photos, les couleurs et les chansons. Appuyez sur Enregistrer pour garder votre brouillon.",
+      bodyMobile: "Dans l'onglet Canevas, touchez une section, puis ouvrez l'onglet Modifier pour changer vos mots, photos, couleurs et chansons. Appuyez sur Enregistrer pour garder votre brouillon.",
+    },
+    preview: {
+      title: 'Aperçu',
+      heading: 'Vérifiez le résultat',
+      body: "Appuyez sur Aperçu pour voir votre page exactement comme la personne avec qui vous la partagez la verra.",
+    },
+    publish: {
+      title: 'Publier',
+      heading: 'Publiez et partagez',
+      body: "Appuyez sur Publier, choisissez votre lien (memoriz.club/votre-nom) et partagez-le en lien ou en QR code. Vous pouvez continuer à modifier et republier à tout moment.",
+    },
+    back: 'Retour',
+    next: 'Suivant',
+    start: 'Commencer',
+    skip: 'Passer la visite',
+    help: 'Comment ça marche',
   },
   share: {
     button: 'Partager',
