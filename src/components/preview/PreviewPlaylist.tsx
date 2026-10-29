@@ -92,12 +92,6 @@ export default function PreviewPlaylist({ values, isPreview = false }: Props) {
 
   const hasPlayableSong = songs.some((s) => s.videoId);
 
-  // Load the player up front so a tap can start playback straight away
-  // (browsers only allow sound right after a user gesture).
-  useEffect(() => {
-    if (hasPlayableSong) getPlayer();
-  }, [hasPlayableSong]);
-
   useEffect(() => {
     return () => {
       stopPolling();
@@ -120,6 +114,8 @@ export default function PreviewPlaylist({ values, isPreview = false }: Props) {
     setLoading(index);
     currentRef.current = index;
 
+    // The player is only loaded on the first press, never just by opening the
+    // page: loading it sends the visitor's IP address to Google (GDPR).
     const start = (player: YTPlayer) => {
       if (currentRef.current === index) player.loadVideoById(videoId);
     };
@@ -344,6 +340,9 @@ export default function PreviewPlaylist({ values, isPreview = false }: Props) {
         >
           ♪ {values.footerNote || p.footer} ♪
         </motion.p>
+        {hasPlayableSong && (
+          <p className="text-center text-xs text-foreground/60 mt-4 max-w-md mx-auto">{p.youtubeNotice}</p>
+        )}
       </div>
     </section>
   );

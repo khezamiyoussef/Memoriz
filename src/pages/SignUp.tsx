@@ -7,10 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { authErrorMessage, registerUser } from "@/lib/api";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Dictionary } from "@/i18n/translations";
 import memorizLogo from "@/assets/logo.png";
+import LegalFooter from "@/components/LegalFooter";
 
 const makeSignUpSchema = (t: Dictionary) =>
   z
@@ -19,6 +21,8 @@ const makeSignUpSchema = (t: Dictionary) =>
       email: z.string().email(t.auth.validation.email),
       password: z.string().min(8, t.auth.validation.passwordMin),
       confirmPassword: z.string(),
+      // Age (GDPR Art. 8: 16 in Germany) and Terms, in one explicit opt-in
+      acceptTerms: z.boolean().refine((v) => v, t.legal.consentRequired),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t.auth.validation.passwordMismatch,
@@ -33,7 +37,7 @@ export default function SignUp() {
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(makeSignUpSchema(t)),
-    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "", acceptTerms: false },
   });
 
   async function onSubmit(values: SignUpFormValues) {
@@ -56,7 +60,7 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-background px-4 py-8">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <img src={memorizLogo} alt="Memoriz" className="w-12 h-16 mx-auto mb-2 object-contain" />
@@ -118,6 +122,32 @@ export default function SignUp() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="acceptTerms"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-start gap-2">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} className="mt-0.5" />
+                      </FormControl>
+                      <FormLabel className="text-sm font-normal leading-snug">
+                        {t.legal.consentBefore}
+                        {/* New tab, so the half-filled form isn't lost */}
+                        <a href={`${import.meta.env.BASE_URL}legal/terms`} target="_blank" rel="noreferrer" className="text-primary underline">
+                          {t.legal.terms}
+                        </a>
+                        {t.legal.consentMiddle}
+                        <a href={`${import.meta.env.BASE_URL}legal/privacy`} target="_blank" rel="noreferrer" className="text-primary underline">
+                          {t.legal.privacy}
+                        </a>
+                        {t.legal.consentAfter}
+                      </FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                 {t.auth.signup.submit}
               </Button>
@@ -131,6 +161,7 @@ export default function SignUp() {
           </p>
         </CardContent>
       </Card>
+      <LegalFooter />
     </div>
   );
 }

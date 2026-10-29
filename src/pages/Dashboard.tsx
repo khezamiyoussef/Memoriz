@@ -10,8 +10,9 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode, LogOut, HelpCircle } from 'lucide-react';
+import { Save, Eye, CheckCircle, Layers, LayoutDashboard, SlidersHorizontal, Globe, Loader2, ExternalLink, QrCode, LogOut, HelpCircle, UserRound, Download, FileText, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import memorizLogo from '../assets/logo.png';
 import { CanvasItem } from '../types/builder';
 import { getTemplate, countImages } from '../data/templates';
@@ -27,7 +28,25 @@ import OnboardingTour, { type TourStep } from '../components/onboarding/Onboardi
 import { shouldShowOnboarding } from '../lib/onboarding';
 import { getMySite, saveDraft, publicSiteUrl, MySite } from '../lib/sites';
 import { sanitizeContent } from '../lib/content';
-import { logoutUser, authErrorMessage } from '../lib/api';
+import { logoutUser, authErrorMessage, downloadMyData, deleteMyAccount } from '../lib/api';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Lang } from '../i18n/translations';
 
@@ -59,6 +78,8 @@ export default function Dashboard() {
   const [showPreview, setShowPreview] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('templates');
   const [showTour, setShowTour] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -197,6 +218,27 @@ export default function Dashboard() {
     }
   };
 
+  const handleDownloadData = async () => {
+    try {
+      await downloadMyData();
+    } catch {
+      toast.error(t.account.downloadError);
+    }
+  };
+
+  // RequireAuth sees the sign-out that follows and redirects to /login
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      await deleteMyAccount();
+      try { localStorage.removeItem(LEGACY_STORAGE_KEY); } catch { /* ignore */ }
+      toast.success(t.account.deleted);
+    } catch {
+      toast.error(t.account.deleteError);
+      setDeletingAccount(false);
+    }
+  };
+
   const liveUrl = site?.slug && site.published_at ? publicSiteUrl(site.slug) : null;
 
   // The tour opens the editor on its Edit step; start building from the templates instead
@@ -324,20 +366,65 @@ export default function Dashboard() {
         onClick={() => setShowTour(true)}
         title={t.onboarding.help}
         aria-label={t.onboarding.help}
-        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+        className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition"
       >
         <HelpCircle className="w-4 h-4" />
       </button>
 
-      {/* RequireAuth sees the sign-out and redirects to /login */}
-      <button
-        onClick={handleLogout}
-        title={t.dashboard.logout}
-        aria-label={t.dashboard.logout}
-        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
-      >
-        <LogOut className="w-4 h-4" />
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          title={t.account.menu}
+          aria-label={t.account.menu}
+          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition"
+        >
+          <UserRound className="w-4 h-4" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>{t.account.menu}</DropdownMenuLabel>
+          <DropdownMenuItem onSelect={handleDownloadData}>
+            <Download className="w-4 h-4 mr-2" />
+            {t.account.download}
+          </DropdownMenuItem>
+          {(['imprint', 'privacy', 'terms'] as const).map((doc) => (
+            <DropdownMenuItem key={doc} asChild>
+              <Link to={`/legal/${doc}`}>
+                <FileText className="w-4 h-4 mr-2" />
+                {t.legal[doc]}
+              </Link>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          {/* RequireAuth sees the sign-out and redirects to /login */}
+          <DropdownMenuItem onSelect={handleLogout}>
+            <LogOut className="w-4 h-4 mr-2" />
+            {t.dashboard.logout}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setShowDeleteAccount(true)} className="text-red-600 focus:text-red-700">
+            <Trash2 className="w-4 h-4 mr-2" />
+            {t.account.delete}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={showDeleteAccount} onOpenChange={(open) => !deletingAccount && setShowDeleteAccount(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.account.deleteTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{t.account.deleteDesc}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingAccount}>{t.account.deleteCancel}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
+              disabled={deletingAccount}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deletingAccount && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {t.account.deleteConfirm}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <OnboardingTour open={showTour} onClose={closeTour} onStep={prepareTourStep} />
 

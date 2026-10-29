@@ -191,7 +191,7 @@ export default function ElementEditor({ item, onUpdate, onDelete, onClose, image
           </div>
           <p className="text-xs text-gray-400 mt-0.5">{t.editor.subtitle}</p>
         </div>
-        <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg transition">
+        <button onClick={onClose} aria-label={t.editor.close} className="p-1.5 hover:bg-gray-100 rounded-lg transition">
           <X className="w-4 h-4 text-gray-500" />
         </button>
       </div>
@@ -199,9 +199,12 @@ export default function ElementEditor({ item, onUpdate, onDelete, onClose, image
       {/* Fields */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {template.fields.some((f) => f.type === 'image') && (
-          <p className={`text-[11px] ${imageCount >= MAX_IMAGES ? 'text-amber-600' : 'text-gray-400'}`}>
-            {t.editor.photoCount(imageCount, MAX_IMAGES)}
-          </p>
+          <>
+            <p className={`text-[11px] ${imageCount >= MAX_IMAGES ? 'text-amber-700' : 'text-gray-500'}`}>
+              {t.editor.photoCount(imageCount, MAX_IMAGES)}
+            </p>
+            <p className="text-[11px] leading-snug text-gray-500">{t.editor.photoRights}</p>
+          </>
         )}
         {template.fields.map(renderField)}
       </div>

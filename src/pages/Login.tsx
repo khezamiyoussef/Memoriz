@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Dictionary } from "@/i18n/translations";
 import memorizLogo from "@/assets/logo.png";
+import LegalFooter from "@/components/LegalFooter";
 
 const makeLoginSchema = (t: Dictionary) =>
   z.object({
@@ -81,7 +82,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-background px-4 py-8">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <img src={memorizLogo} alt="Memoriz" className="w-12 h-16 mx-auto mb-2 object-contain" />
@@ -141,6 +142,7 @@ export default function Login() {
           </p>
         </CardContent>
       </Card>
+      <LegalFooter />
     </div>
   );
 }

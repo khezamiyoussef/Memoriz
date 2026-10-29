@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import LanguageSelect from "./pages/LanguageSelect";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import PublicSite from "./pages/PublicSite";
+import Legal from "./pages/Legal";
 import RequireAuth from "./components/RequireAuth";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/language" element={<RequireAuth><LanguageSelect /></RequireAuth>} />
           <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/legal/:doc" element={<Legal />} />
           {/* Published sites; app routes above must be listed in public.is_reserved_slug() */}
           <Route path="/:slug" element={<PublicSite />} />
           <Route path="*" element={<NotFound />} />
